@@ -12,10 +12,6 @@ ctx.fillStyle = "#60CFD0";
 
 var requestID; //To store the current animation frame ID
 
-//Get the DVD logo for later
-var logo = new Image();
-logo.src = "logo_dvd.jpg";
-
 /*------------------------ Random Number Generator ------------------------*/
 
 //Found this code online
@@ -25,35 +21,43 @@ var getRandomInt = function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-/*---------------------------- DVD Bouncing -------------------------------*/
+/*------------------------- The Ball Object Class -------------------------*/
 
-//Set x and y velocities 
-var xvel = 1;
-var yvel = 1;
-//Set image width and height
-var imgW = 100;
-var imgH = 50;
-//Initialize current x and y coordinates
-var xcor = getRandomInt(0,c.width-imgW);
-var ycor = getRandomInt(0,c.height-imgH);
+var ball = function(startx,starty,radius){
+    //Current x and y coords of the ball
+    var x = startx;
+    var y = starty;
+    //Radius of the ball
+    var r = radius;
+   
+    //Current x and y velocities of the ball
+    var xvel = 1;
+    var yvel = 1;
+    
+    return {
+	getx : function(){ return x; },
+	gety : function(){ return y; ),
+	getr : function(){ return r; },
 
-//Make DVD move and bounce around the canvas
-var bounceDVD = function bounceDVD(){
-    //Increment the x and y coords
-    xcor = xcor + xvel;
-    ycor = ycor + yvel;
-    //Negate the velocities if we hit extreme values
-    if(xcor <= 0 || xcor+imgW > c.width){
-	xvel = -1*xvel;
-    } else if (ycor <= 0 || ycor+imgH > c.height){
-	yvel = -1*yvel;
+	//We don't need set functions - we only need to move the ball's 
+	//position by its velocity, which we do with increment functions
+	incx : function(){ x += xvel; },
+	incy : function(){ y += yvel; },
+
+	getxv : function(){ return xvel; },
+	getyv : function(){ return yvel; },
+
+	//Velocities will never have a magnitude > 1 (hard to do collision)
+	//Therefore we only need to negate them when the ball bounces
+	negxv : function(){ xvel *= -1; },
+	negyv : function(){ yvel *= -1; },
     }
-    //Actually draw the image
-    ctx.drawImage(logo,xcor,ycor,imgW,imgH);
-    //Call function again
-    requestID = window.requestAnimationFrame(bounceDVD);
 };
 
-//Link DVD button to bouncing DVD function
-var dvdbtn = document.getElementById("dvd");
-dvdbtn.addEventListener("click",bounceDVD);
+/*------------------------- Making the Balls Bounce -------------------------*/
+
+var bounceBall = function(){
+    var rad = getRandomInt(2,5)*5;
+    var bouncer = ball(getRandomInt(rad, c.width-rad), 
+		       getRandomInt(rad, c.height-rad), rad); 
+};
