@@ -1,4 +1,5 @@
 console.log("animate");
+var ballArr = [];
 
 /*--------------------------- Initialization -----------------------------*/
 
@@ -23,6 +24,11 @@ var ball = function(startx,starty,radius){
     var y = starty;
     //Radius of the ball
     var r = radius;
+
+    //Also generate a random color to spice things up
+    var red = getRandomInt(0,255);
+    var green = getRandomInt(0,255);
+    var blue = getRandomInt(0,255);
    
     //Current x and y velocities of the ball
     var xvel = 1;
@@ -38,6 +44,10 @@ var ball = function(startx,starty,radius){
 	incx : function(i){ x += i; },
 	incy : function(j){ y += j; },
 
+	getre : function(){ return red; },
+	getgr : function(){ return green; },
+	getbl : function(){ return blue; },
+
 	getxv : function(){ return xvel; },
 	getyv : function(){ return yvel; },
 
@@ -48,29 +58,32 @@ var ball = function(startx,starty,radius){
 
 /*------------------------- Making the Balls Bounce -------------------------*/
 
-var bounceBall = function(){
-    console.log("bounceBall");
+var appendBall = function(){
+    console.log("appendBall");
     //Instantiate a new ball with random radius and x/y components 
     var rad = getRandomInt(2,5)*5;
     var b = ball(getRandomInt(rad, c.width-rad), 
-		       getRandomInt(rad, c.height-rad), rad); 
+		 getRandomInt(rad, c.height-rad), rad); 
+    ballArr.push(b);
+};
 
-    //Also generate a random color to spice things up
-    var red = getRandomInt(0,255);
-    var green = getRandomInt(0,255);
-    var blue = getRandomInt(0,255);
+//In here is where the animation happens
+var bouncy = function(){
+    console.log("bouncy");
+    //Clear the square where the ball used to be 
+    //-1's and +2's because otherwise it doesn't cover the whole ball
+    ctx.clearRect(0,0,c.width,c.height);
     
-    //In here is where the animation happens
-    var bouncy = function(){
-	console.log("bouncy");
-	//Clear the square where the ball used to be 
-	//-1's and +2's because otherwise it doesn't cover the whole ball
-	ctx.clearRect(b.getx()-rad-1, b.gety()-rad-1, rad*2+2, rad*2+2);
-	
+    var i=0;
+    while (i<ballArr.length){
+	var b = ballArr[i];
+
 	//Increment the ball's position
 	b.incx(b.getxv()); 
 	b.incy(b.getyv());
 
+	var rad = b.getr();
+	
 	//Check collision with borders or other balls
 	//Border check
 	if(b.getx() < rad || b.getx() > c.width - rad){
@@ -80,26 +93,38 @@ var bounceBall = function(){
 	    b.setyv(-1*b.getyv());
 	}
 
+	var i2 = 0;
+	while (i2<ballArr.length && i!=i2 ){
+	    var c = ballArr[i2];
+	    if ( (c.getx()-b.getx())*(c.getx()-b.getx()) + (c.gety()-b.gety())*(c.gety()-b.gety()) < (c.getr()+b.getr()) * (c.getr() + b.getr()) ) {
+		//collided //http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
+		newVelX1 = (b.getxv() * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.getxv())) / (b.mass + secondBall.mass);
+		newVelY1 = (b.speed.y * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.y)) / (b.mass + secondBall.mass);
+		newVelX2 = (secondBall.getxv() * (secondBall.mass – b.mass) + (2 * b.mass * b.getxv())) / (b.mass + secondBall.mass);
+		newVelY2 = (secondBall.speed.y * (secondBall.mass – b.mass) + (2 * b.mass * b.speed.y))
+		
 	//Actually draw the ball 
-	ctx.fillStyle = "rgb("+red+","+green+","+blue+")";
+	ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
 	ctx.beginPath();
 	ctx.arc(b.getx(),b.gety(),b.getr(),0,2*Math.PI);
 	ctx.stroke();
-	ctx.fill();
-	
-	//Call the function again
-	window.requestAnimationFrame(bouncy);
-    };
-    bouncy();
+	ctx.fill();	
+	i++;
+    }
+    //Call the function again
+    window.requestAnimationFrame(bouncy);
 };
 
-/*---------- Helper Functions ----------*/
+/*Algorithm:
+  compare two circles
+  if square(x1-x2)+aquare(y1-y2) < square(radius1+radius2):
+     Collided
+  
 
-//Border check - checks if ball is bumping into border of canvas
-var borderCheck = function(b){
-   
-};
+//add ball should add a ball to the array of balls
+// function that loops through the array and moves it
 
 //Link "Add Ball" button to ball creation function
 var addbtn = document.getElementById("balls");
-addbtn.addEventListener("click", bounceBall);
+addbtn.addEventListener("click", appendBall);
+bouncy();
