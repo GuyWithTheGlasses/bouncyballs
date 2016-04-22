@@ -35,13 +35,13 @@ var ball = function(startx,starty,radius){
    
     //Current x and y velocities of the ball
     var xvel = getRandomInt(0,10) - 5;
-    if (xvel < 2 && xvel > 0){
+    if (xvel < 2 && xvel >= 0){
 	xvel += 2;
     } else if (xvel > -2 && xvel < 0){
 	xvel -= 2;
     }
     var yvel = getRandomInt(0,10) - 5;
-    if (yvel < 2 && yvel > 0){
+    if (yvel < 2 && yvel >= 0){
 	yvel += 2;
     } else if (yvel > -2 && yvel < 0){
 	yvel -= 2;
@@ -97,6 +97,7 @@ var appendBall = function(){
 //In here is where the animation happens
 var bouncy = function(){
     console.log("bouncy");
+    alter;
     //Clear the square where the ball used to be 
     //-1's and +2's because otherwise it doesn't cover the whole ball
     ctx.clearRect(0,0,c.width, c.height);
@@ -165,3 +166,16 @@ var bouncy = function(){
 var addbtn = document.getElementById("balls");
 addbtn.addEventListener("click", appendBall);
 bouncy();
+
+var alter = ballArr.filter(function(ball){
+    if ( ball.getx() - ball.getr() < -2 ){ //top
+	ball.setx( ball.getx() + -1*(ball.getx() - ball.getr()) + 5 );
+	console.log(ball.getx() + -1*(ball.getx() - ball.getr()) + 5);
+    } if ( ball.gety() - ball.getr() < -5 ){
+	ball.sety( ball.gety() + 5 );
+    } if ( ball.getx() + ball.getr() > c.width ){
+	ball.setx( ball.getx() - 5 );
+    } if ( ball.gety() + ball.getr() < c.height ){
+	ball.sety( ball.gety() - 5 );
+    }
+}); //fix this, imagine this is at the edge
