@@ -68,9 +68,21 @@ var appendBall = function(){
     console.log("appendBall");
     //Instantiate a new ball with random radius and x/y components 
     var rad = 25;
-    var bouncer = ball(getRandomInt(rad, c.width-rad), 
+    var j = 0;
+    var b = ball(getRandomInt(rad, c.width-rad), 
 		 getRandomInt(rad, c.height-rad), rad); 
-    ballArr.push(bouncer);
+    while (j<ballArr.length){
+	var other = ballArr[j];
+	    if ( (other.getx()-b.getx())*(other.getx()-b.getx()) + 
+		 (other.gety()-b.gety())*(other.gety()-b.gety()) < 
+		 (other.getr()+b.getr()) * (other.getr() + b.getr()) ) {
+		j=0;
+		b = ball(getRandomInt(rad, c.width-rad), 
+	 		     getRandomInt(rad, c.height-rad), rad); 
+	    }
+	j++;
+    }
+    ballArr.push(b);
 };
 
 //In here is where the animation happens
