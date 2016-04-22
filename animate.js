@@ -58,6 +58,9 @@ var ball = function(startx,starty,radius){
 	getre : function(){ return red; },
 	getgr : function(){ return green; },
 	getbl : function(){ return blue; },
+	setre : function(re){ red = re; },
+	setgr : function(gr){ green = gr; },
+	setbl : function(bl){ blue = bl; },
 
 	//x and y velocities of the ball
 	getxv : function(){ return xvel; },
@@ -77,9 +80,9 @@ var appendBall = function(){
     console.log("appendBall");
     //Instantiate a new ball with random radius and x/y components 
     var rad = 25;
-    var j = 0;
     var b = ball(getRandomInt(rad, c.width-rad), 
 		 getRandomInt(rad, c.height-rad), rad); 
+    var j = 0;
     while (j<ballArr.length){
 	var other = ballArr[j];
 	    if ( (other.getx()-b.getx())*(other.getx()-b.getx()) + 
@@ -153,18 +156,29 @@ var bouncy = function(){
     window.requestAnimationFrame(bouncy);
 };
 
-/* Algorithm:
-  compare two circles
-  if square(x1-x2)+aquare(y1-y2) < square(radius1+radius2):
-     Collided
-*/  
+//Using mapping to make cool things happen
+//Change the color of each ball to another random color
+var colorChange = function(){
+    ballArr = ballArr.map(function(ball){
+	ball.setre(getRandomInt(0,255));
+	ball.setgr(getRandomInt(0,255));
+	ball.setbl(getRandomInt(0,255));
+	return ball;
+    });
+};
 
-//add ball should add a ball to the array of balls
-// function that loops through the array and moves it
+//Link "Spice it up!" button to color change function
+var colorbtn = document.getElementById("colorful");
+colorbtn.addEventListener("click", colorChange);
 
-//Link "Add Ball" button to ball creation function
+//Link "Add Ball" buttons to ball creation function
 var addbtn = document.getElementById("balls");
 addbtn.addEventListener("click", appendBall);
+//And the "Add 10 Balls" button
+var addmorebtn = document.getElementById("moreballs");
+addmorebtn.addEventListener("click", function(){
+    for(var x=0; x<10; x++){ appendBall(); }
+});
 bouncy();
 
 var alter = ballArr.filter(function(ball){
