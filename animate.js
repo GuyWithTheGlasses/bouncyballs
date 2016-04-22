@@ -1,11 +1,13 @@
 console.log("animate");
-var ballArr = [];
 
 /*--------------------------- Initialization -----------------------------*/
 
 //Get the canvas and prep it for 2d drawing
 var c = document.getElementById("playground");
 var ctx = c.getContext("2d");
+
+//Array for storing all generated balls 
+var ballArr = [];
 
 /*------------------------ Random Number Generator ------------------------*/
 
@@ -31,28 +33,31 @@ var ball = function(startx,starty,radius){
     var blue = getRandomInt(0,255);
    
     //Current x and y velocities of the ball
-    var xvel = 1;
-    var yvel = 1;
+    var xvel = getRandomInt(2,5);
+    var yvel = getRandomInt(2,5);
     
     return {
+	//Coordinates & radius of the ball
 	getx : function(){ return x; },
 	gety : function(){ return y; },
 	getr : function(){ return r; },
+	setx : function(newx){ x = newx; },
+	sety : function(newy){ y = newy; },
 
-	//We don't need set functions - we only need to change the ball's 
-	//position by its velocity, which we can do with increment functions
-	incx : function(i){ x += i; },
-	incy : function(j){ y += j; },
-
+	//Color of the ball
 	getre : function(){ return red; },
 	getgr : function(){ return green; },
 	getbl : function(){ return blue; },
 
+	//x and y velocities of the ball
 	getxv : function(){ return xvel; },
 	getyv : function(){ return yvel; },
-
 	setxv : function(xv){ xvel = xv; },
-	setyv : function(yv){ yvel = yv; }
+	setyv : function(yv){ yvel = yv; },
+
+	//To increment by the ball's velocities
+	movex : function(){ x += xvel; },
+	movey : function(){ y += yvel; },
     }
 };
 
@@ -61,10 +66,10 @@ var ball = function(startx,starty,radius){
 var appendBall = function(){
     console.log("appendBall");
     //Instantiate a new ball with random radius and x/y components 
-    var rad = getRandomInt(2,5)*5;
-    var b = ball(getRandomInt(rad, c.width-rad), 
+    var rad = 25;
+    var bouncer = ball(getRandomInt(rad, c.width-rad), 
 		 getRandomInt(rad, c.height-rad), rad); 
-    ballArr.push(b);
+    ballArr.push(bouncer);
 };
 
 //In here is where the animation happens
@@ -78,31 +83,39 @@ var bouncy = function(){
     while (i<ballArr.length){
 	var b = ballArr[i];
 
-	//Increment the ball's position
-	b.incx(b.getxv()); 
-	b.incy(b.getyv());
+	//Change the ball's position according to its velocities
+	b.movex();
+	b.movey();
 
-	var rad = b.getr();
-	
 	//Check collision with borders or other balls
 	//Border check
-	if(b.getx() < rad || b.getx() > c.width - rad){
+	if(b.getx() < b.getr() || b.getx() > c.width - b.getr()){
 	    b.setxv(-1*b.getxv());
 	}
-	if(b.gety() < rad || b.gety() > c.height - rad){
+	if(b.gety() < b.getr() || b.gety() > c.height - b.getr()){
 	    b.setyv(-1*b.getyv());
 	}
-
-	var i2 = 0;
-	while (i2<ballArr.length && i!=i2 ){
-	    var c = ballArr[i2];
-	    if ( (c.getx()-b.getx())*(c.getx()-b.getx()) + (c.gety()-b.gety())*(c.gety()-b.gety()) < (c.getr()+b.getr()) * (c.getr() + b.getr()) ) {
-		//collided //http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
-		newVelX1 = (b.getxv() * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.getxv())) / (b.mass + secondBall.mass);
-		newVelY1 = (b.speed.y * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.y)) / (b.mass + secondBall.mass);
-		newVelX2 = (secondBall.getxv() * (secondBall.mass – b.mass) + (2 * b.mass * b.getxv())) / (b.mass + secondBall.mass);
-		newVelY2 = (secondBall.speed.y * (secondBall.mass – b.mass) + (2 * b.mass * b.speed.y))
-		
+	//Ball collision check
+	var j = 0;
+	while (j<ballArr.length && i != j ){
+	    var other = ballArr[j];
+	    if ( (other.getx()-b.getx())*(other.getx()-b.getx()) + 
+		 (other.gety()-b.gety())*(other.gety()-b.gety()) < 
+		 (other.getr()+b.getr()) * (other.getr() + b.getr()) ) {
+		//balls have collided 
+		//http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
+		var newxvb = (b.getxv() * (b.getr() - other.getr()) + (2 * other.getr() * other.getxv())) / (b.getr() + other.getr());
+		var newyvb = (b.getyv() * (b.getr() - other.getr()) + (2 * other.getr() * other.getyv())) / (b.getr() + other.getr());
+		var newxvo = (other.getxv() * (other.getr() - b.getr()) + (2 * b.getr() * b.getxv())) / (b.getr() + other.getr());
+		var newyvo = (other.getyv() * (other.getr() - b.getr()) + (2 * b.getr() * b.getyv())) / (b.getr() + other.getr());
+		b.setxv(newxvb);
+		b.setyv(newyvb);
+		other.setxv(newxvo);
+		other.setyv(newyvo);
+	    }
+	    j++;
+	}
+	
 	//Actually draw the ball 
 	ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
 	ctx.beginPath();
@@ -119,7 +132,7 @@ var bouncy = function(){
   compare two circles
   if square(x1-x2)+aquare(y1-y2) < square(radius1+radius2):
      Collided
-  
+*/
 
 //add ball should add a ball to the array of balls
 // function that loops through the array and moves it
