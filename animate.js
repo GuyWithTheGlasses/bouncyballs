@@ -34,9 +34,18 @@ var ball = function(startx,starty,radius){
     var blue = getRandomInt(0,255);
    
     //Current x and y velocities of the ball
-    var xvel = getRandomInt(2,5);
-    var yvel = getRandomInt(2,5);
-    
+    var xvel = getRandomInt(0,10) - 5;
+    if (xvel < 2 && xvel > 0){
+	xvel += 2;
+    } else if (xvel > -2 && xvel < 0){
+	xvel -= 2;
+    }
+    var yvel = getRandomInt(0,10) - 5;
+    if (yvel < 2 && yvel > 0){
+	yvel += 2;
+    } else if (yvel > -2 && yvel < 0){
+	yvel -= 2;
+    }
     return {
 	//Coordinates & radius of the ball
 	getx : function(){ return x; },
@@ -126,6 +135,7 @@ var bouncy = function(){
 		b.setyv(newyvb);
 		other.setxv(newxvo);
 		other.setyv(newyvo);
+		free = false;
 	    }
 	    j++;
 	}
