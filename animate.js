@@ -1,4 +1,4 @@
-console.log("animate");
+﻿console.log("animate");
 var ballArr = [];
 
 /*--------------------------- Initialization -----------------------------*/
@@ -72,7 +72,7 @@ var bouncy = function(){
     console.log("bouncy");
     //Clear the square where the ball used to be 
     //-1's and +2's because otherwise it doesn't cover the whole ball
-    ctx.clearRect(0,0,c.width,c.height);
+    ctx.clearRect(0,0,c.width, c.height);
     
     var i=0;
     while (i<ballArr.length){
@@ -95,14 +95,16 @@ var bouncy = function(){
 
 	var i2 = 0;
 	while (i2<ballArr.length && i!=i2 ){
-	    var c = ballArr[i2];
-	    if ( (c.getx()-b.getx())*(c.getx()-b.getx()) + (c.gety()-b.gety())*(c.gety()-b.gety()) < (c.getr()+b.getr()) * (c.getr() + b.getr()) ) {
+	    var b2 = ballArr[i2];
+	    if ( (b2.getx()-b.getx())*(b2.getx()-b.getx()) + (b2.gety()-b.gety())*(b2.gety()-b.gety()) < (b2.getr()+b.getr()) * (b2.getr() + b.getr()) ) {
 		//collided //http://gamedevelopment.tutsplus.com/tutorials/when-worlds-collide-simulating-circle-circle-collisions--gamedev-769
-		newVelX1 = (b.getxv() * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.getxv())) / (b.mass + secondBall.mass);
-		newVelY1 = (b.speed.y * (b.mass – secondBall.mass) + (2 * secondBall.mass * secondBall.speed.y)) / (b.mass + secondBall.mass);
-		newVelX2 = (secondBall.getxv() * (secondBall.mass – b.mass) + (2 * b.mass * b.getxv())) / (b.mass + secondBall.mass);
-		newVelY2 = (secondBall.speed.y * (secondBall.mass – b.mass) + (2 * b.mass * b.speed.y))
-		
+		newVelX1 = (b.getxv() * (b.getr() - b2.getr()) + (2 * b2.getr() * b2.getxv())) / (b.getr() + b2.getr());
+		newVelY1 = (b.getyv()  * (b.getr() - b2.getr()) + (2 * b2.getr() * b2.getyv() )) / (b.getr() + b2.getr());
+		newVelX2 = (b2.getxv() * (b2.getr() - b.getr()) + (2 * b.getr() * b.getxv())) / (b.getr() + b2.getr());
+		newVelY2 = (b2.getyv()  * (b2.getr() - b.getr()) + (2 * b.getr() * b.getyv() ));
+	    }
+	    i2++;
+	}
 	//Actually draw the ball 
 	ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
 	ctx.beginPath();
@@ -115,11 +117,11 @@ var bouncy = function(){
     window.requestAnimationFrame(bouncy);
 };
 
-/*Algorithm:
+/* Algorithm:
   compare two circles
   if square(x1-x2)+aquare(y1-y2) < square(radius1+radius2):
      Collided
-  
+*/  
 
 //add ball should add a ball to the array of balls
 // function that loops through the array and moves it
