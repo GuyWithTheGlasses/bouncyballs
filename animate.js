@@ -46,8 +46,8 @@ var ball = function(startx,starty,radius){
     } else if (yvel > -2 && yvel < 0){
 	yvel -= 2;
     }
-    xvel=xvel;
-    yvel = yvel;
+    xvel=xvel/10;
+    yvel = yvel/10;
     return {
 	//Coordinates & radius of the ball
 	getx : function(){ return x; },
@@ -89,7 +89,7 @@ var appendBall = function(){
 	var other = ballArr[j];
 	    if ( (other.getx()-b.getx())*(other.getx()-b.getx()) + 
 		 (other.gety()-b.gety())*(other.gety()-b.gety()) < 
-		 (other.getr()+b.getr()) * (other.getr() + b.getr()) ) {
+		 (other.getr()+b.getr()) * (other.getr() + b.getr()) -2 ) {
 		j=0;
 		b = ball(getRandomInt(rad, c.width-rad), 
 	 		     getRandomInt(rad, c.height-rad), rad); 
@@ -99,45 +99,24 @@ var appendBall = function(){
     ballArr.push(b);
 };
 
-var alter = ballArr.filter(function(ball){
-    console.log( ball.getx() - ball.getr() );
-    if ( ball.getx() - ball.getr() < -1  && ball.xvel < (ball.getx() - ball.getr())*-1 ){ //left and going left
-	//ball.setx( ball.getx() + -1*(ball.getx() - ball.getr()) + 5 );
-	ball.setx( Math.abs( ball.getx() ) );
-	ball.setxv( Math.abs( ball.getxv() ) );
-	console.log(ball.getx() + -1*(ball.getx() - ball.getr()) + 5);
-    } if ( ball.gety() - ball.getr() < -5 ){
-	ball.sety( ball.gety() + 5 );
-    } if ( ball.getx() + ball.getr() > c.width ){
-	ball.setx( ball.getx() - 5 );
-    } if ( ball.gety() + ball.getr() < c.height ){
-	ball.sety( ball.gety() - 5 );
-    }
-});
-
 //In here is where the animation happens
 var bouncy = function(){
     console.log("bouncy");
-    alert = false;
-    //alter;
     ballArr.filter(function(ball){
-    
-    console.log( "xvel is "+ball.getxv() );	
-    if ( ball.getx() - ball.getr() < -1 ){ //left
-	ball.setx( Math.abs( ball.getx() ) );
-	ball.setxv( Math.abs( ball.getxv() ) );   
-    } if (ball.gety() - ball.getr() < -1 ){ //too high
-        ball.sety( Math.abs( ball.gety() )) ;
-	ball.setyv( Math.abs( ball.getyv() ) );   
-    } if ( ball.getx() + ball.getr() > c.width ){ //right
-	ball.setx( ball.getx() + (c.width - ball.getx()-ball.getr() ) );
-	ball.setxv( Math.abs(ball.getxv()) * -1 );   
-    } if (ball.gety() + ball.getr() > c.height ){ //too low
-	ball.sety( ball.gety() + (c.height - ball.gety() - ball.getr() ) );
-	ball.setyv( Math.abs(ball.getxv()) * -1 );
-    }
- }); 
-
+    	if ( ball.getx() - ball.getr() < -1 ){ //left
+	    ball.setx( Math.abs( ball.getx() ) );
+	    ball.setxv( Math.abs( ball.getxv() ) );   
+    	} if (ball.gety() - ball.getr() < -1 ){ //too high
+            ball.sety( Math.abs( ball.gety() )) ;
+	    ball.setyv( Math.abs( ball.getyv() ) );   
+    	} if ( ball.getx() + ball.getr() > c.width ){ //right
+	    ball.setx( ball.getx() + (c.width - ball.getx()-ball.getr() ) );
+	    ball.setxv( Math.abs(ball.getxv()) * -1 );   
+    	} if (ball.gety() + ball.getr() > c.height ){ //too low
+	    ball.sety( ball.gety() + (c.height - ball.gety() - ball.getr() ) );
+	    ball.setyv( Math.abs(ball.getxv()) * -1 );
+    	}
+    }); 
 
     //Clear the square where the ball used to be 
     //-1's and +2's because otherwise it doesn't cover the whole ball
@@ -145,6 +124,7 @@ var bouncy = function(){
 
     var i=0;
     while (i<ballArr.length){
+
 	var b = ballArr[i];
 
 	//Change the ball's position according to its velocities
@@ -177,18 +157,15 @@ var bouncy = function(){
 		b.setyv(newyvb);
 		other.setxv(newxvo);
 		other.setyv(newyvo);
-		free = false;
 	    }
 	    j++;
-	}
-	//Actually draw the ball 
+	} 
         ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
 	ctx.beginPath();
 	ctx.arc(b.getx(),b.gety(),b.getr(),0,2*Math.PI);
 	ctx.stroke();
 	ctx.fill();	
 	i++;
-
     } //while for
     //Call the function again
     window.requestAnimationFrame(bouncy);
@@ -229,6 +206,14 @@ addmorebtn.addEventListener("click", function(){
     for(var x=0; x<10; x++){ appendBall(); }
 });
 bouncy();
+bouncy();
+bouncy();
+bouncy();
+bouncy();
+bouncy();
+bouncy();
+bouncy();
+
 
 
 
