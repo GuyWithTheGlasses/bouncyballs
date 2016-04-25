@@ -46,6 +46,8 @@ var ball = function(startx,starty,radius){
     } else if (yvel > -2 && yvel < 0){
 	yvel -= 2;
     }
+    xvel=xvel;
+    yvel = yvel;
     return {
 	//Coordinates & radius of the ball
 	getx : function(){ return x; },
@@ -97,14 +99,50 @@ var appendBall = function(){
     ballArr.push(b);
 };
 
+var alter = ballArr.filter(function(ball){
+    console.log( ball.getx() - ball.getr() );
+    if ( ball.getx() - ball.getr() < -1  && ball.xvel < (ball.getx() - ball.getr())*-1 ){ //left and going left
+	//ball.setx( ball.getx() + -1*(ball.getx() - ball.getr()) + 5 );
+	ball.setx( Math.abs( ball.getx() ) );
+	ball.setxv( Math.abs( ball.getxv() ) );
+	console.log(ball.getx() + -1*(ball.getx() - ball.getr()) + 5);
+    } if ( ball.gety() - ball.getr() < -5 ){
+	ball.sety( ball.gety() + 5 );
+    } if ( ball.getx() + ball.getr() > c.width ){
+	ball.setx( ball.getx() - 5 );
+    } if ( ball.gety() + ball.getr() < c.height ){
+	ball.sety( ball.gety() - 5 );
+    }
+});
+
 //In here is where the animation happens
 var bouncy = function(){
     console.log("bouncy");
-    alter;
+    alert = false;
+    //alter;
+    ballArr.filter(function(ball){
+    
+    console.log( "xvel is "+ball.getxv() );	
+    if ( ball.getx() - ball.getr() < -1 ){ //left
+	ball.setx( Math.abs( ball.getx() ) );
+	ball.setxv( Math.abs( ball.getxv() ) );   
+    } if (ball.gety() - ball.getr() < -1 ){ //too high
+        ball.sety( Math.abs( ball.gety() )) ;
+	ball.setyv( Math.abs( ball.getyv() ) );   
+    } if ( ball.getx() + ball.getr() > c.width ){ //right
+	ball.setx( ball.getx() + (c.width - ball.getx()-ball.getr() ) );
+	ball.setxv( Math.abs(ball.getxv()) * -1 );   
+    } if (ball.gety() + ball.getr() > c.height ){ //too low
+	ball.sety( ball.gety() + (c.height - ball.gety() - ball.getr() ) );
+	ball.setyv( Math.abs(ball.getxv()) * -1 );
+    }
+ }); 
+
+
     //Clear the square where the ball used to be 
     //-1's and +2's because otherwise it doesn't cover the whole ball
     ctx.clearRect(0,0,c.width, c.height);
-    
+
     var i=0;
     while (i<ballArr.length){
 	var b = ballArr[i];
@@ -143,15 +181,15 @@ var bouncy = function(){
 	    }
 	    j++;
 	}
-	
 	//Actually draw the ball 
-	ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
+        ctx.fillStyle = "rgb("+b.getre()+","+b.getgr()+","+b.getbl()+")";
 	ctx.beginPath();
 	ctx.arc(b.getx(),b.gety(),b.getr(),0,2*Math.PI);
 	ctx.stroke();
 	ctx.fill();	
 	i++;
-    }
+
+    } //while for
     //Call the function again
     window.requestAnimationFrame(bouncy);
 };
@@ -167,9 +205,20 @@ var colorChange = function(){
     });
 };
 
+var disco  = function(){
+    setInterval(function(){ colorChange; }, 1000);
+    console.log("HI");
+};
+
 //Link "Spice it up!" button to color change function
 var colorbtn = document.getElementById("colorful");
 colorbtn.addEventListener("click", colorChange);
+
+//Link "Disco" button to continuously change the color
+var discobtn = document.getElementById("disco");
+discobtn.addEventListener("click", function(){
+	setInterval( colorChange, 100 ); 
+	console.log("hi"); });
 
 //Link "Add Ball" buttons to ball creation function
 var addbtn = document.getElementById("balls");
@@ -181,15 +230,5 @@ addmorebtn.addEventListener("click", function(){
 });
 bouncy();
 
-var alter = ballArr.filter(function(ball){
-    if ( ball.getx() - ball.getr() < -2 ){ //top
-	ball.setx( ball.getx() + -1*(ball.getx() - ball.getr()) + 5 );
-	console.log(ball.getx() + -1*(ball.getx() - ball.getr()) + 5);
-    } if ( ball.gety() - ball.getr() < -5 ){
-	ball.sety( ball.gety() + 5 );
-    } if ( ball.getx() + ball.getr() > c.width ){
-	ball.setx( ball.getx() - 5 );
-    } if ( ball.gety() + ball.getr() < c.height ){
-	ball.sety( ball.gety() - 5 );
-    }
-}); //fix this, imagine this is at the edge
+
+
